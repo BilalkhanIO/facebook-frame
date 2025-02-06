@@ -1,5 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -22,11 +22,17 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head>
         {/* Google AdSense Script */}
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4779738061304824"
-     crossorigin="anonymous"></script>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4779738061304824"
+          crossorigin="anonymous"
+        ></script>
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         {children}
+        <SpeedInsights />
       </body>
     </html>
   );
