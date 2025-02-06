@@ -135,6 +135,7 @@ const ImageEditor = ({ image, frame, zoom, position, onZoomChange, onPositionCha
       </div>
 
       {/* Image Container */}
+<div ref={editorRef}>
       <div
         ref={containerRef}
         className="relative aspect-square overflow-hidden rounded-lg bg-gray-100"
@@ -142,7 +143,7 @@ const ImageEditor = ({ image, frame, zoom, position, onZoomChange, onPositionCha
         onTouchStart={handleTouchStart}
       >
         <div
-          ref={editorRef}
+          
           className="absolute w-full h-full transition-transform duration-150"
           style={{
             transform: `scale(${zoom}) translate(${position.x}px, ${position.y}px) rotate(${rotation}deg)`,
@@ -177,6 +178,7 @@ const ImageEditor = ({ image, frame, zoom, position, onZoomChange, onPositionCha
         )}
       </div>
     </div>
+</div>
   );
 };
 
