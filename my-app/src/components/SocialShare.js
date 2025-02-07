@@ -1,61 +1,106 @@
-import React from "react";
-import { Facebook, Twitter, Linkedin, Share2 } from "lucide-react";
+'use client';
 
-// Helper function to convert data URL to Blob
-const dataURLtoBlob = (dataurl) => {
-  const arr = dataurl.split(",");
-  const mimeMatch = arr[0].match(/:(.*?);/);
-  if (!mimeMatch) return null;
-  const mime = mimeMatch[1];
-  const bstr = atob(arr[1]);
-  let n = bstr.length;
-  const u8arr = new Uint8Array(n);
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
-  }
-  return new Blob([u8arr], { type: mime });
-};
+import { Facebook, Twitter, Linkedin, Link2 } from 'lucide-react';
 
-const SocialShare = ({ shareImageUrl }) => {
-  const handleDirectShare = async () => {
-    if (!shareImageUrl) {
-      alert("No image available to share!");
-      return;
-    }
+export default function SocialShare({ shareImageUrl, type = 'frame' }) {
+  const websiteUrl = 'https://facebook-frame-iota.vercel.app/';
+  const shareData = {
+    title: 'Bacha Khan Month 2025',
+    text: type === 'frame' 
+      ? `Celebrating Bacha Khan Month 2025! 🌟\nI've created my profile frame to honor his legacy of peace and non-violence.\nCreate yours at: ${websiteUrl}\n#BachaKhanMonth2025 #BachaKhan #Peace`
+      : `Sharing wisdom from Bacha Khan Month 2025! 🌟\nInspired by his message of peace and social reform.\nCreate your own quote image at: ${websiteUrl}\n#BachaKhanMonth2025 #BachaKhan #Peace`,
+    url: websiteUrl,
+  };
 
-    const blob = dataURLtoBlob(shareImageUrl);
-    if (!blob) {
-      alert("Unable to process the image.");
-      return;
-    }
-    const file = new File([blob], "bacha-khan-frame.png", { type: blob.type });
-
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({
-          files: [file],
-          title: "Bacha Khan Month 2025",
-          text: "Check out my framed image for Bacha Khan Month 2025! #BachaKhanMonth2025 #BachaKhan #Peace you can also create your own at https://facebook-frame-iota.vercel.app/",
-        });
-      } catch (err) {
-        alert("Direct sharing failed. Please try again.");
+  const handleShare = async (platform) => {
+    try {
+      switch (platform) {
+        case 'facebook':
+          window.open(
+            `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(websiteUrl)}&quote=${encodeURIComponent(shareData.text)}`,
+            '_blank'
+          );
+          break;
+        case 'twitter':
+          window.open(
+            `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareData.text)}`,
+            '_blank'
+          );
+          break;
+        case 'linkedin':
+          window.open(
+            `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(websiteUrl)}&summary=${encodeURIComponent(shareData.text)}`,
+            '_blank'
+          );
+          break;
+        case 'copy':
+          await navigator.clipboard.writeText(shareData.text);
+          alert('Share text and link copied to clipboard!');
+          break;
+        default:
+          if (navigator.share) {
+            const file = await (await fetch(shareImageUrl)).blob();
+            const shareFile = new File([file], 'bacha-khan-2025.png', { type: 'image/png' });
+            
+            await navigator.share({
+              files: [shareFile],
+              title: shareData.title,
+              text: shareData.text,
+            });
+          }
       }
-    } else {
-      alert(
-        "Direct sharing is not supported on this device. Using fallback links."
-      );
+    } catch (error) {
+      console.error('Error sharing:', error);
+      alert('Failed to share. Please try another method.');
     }
   };
 
   return (
-    <button
-      onClick={handleDirectShare}
-      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-    >
-      <Share2 className="w-5 h-5" />
-      Share
-    </button>
+    <div className="mt-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+      <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
+        Share your creation
+      </h3>
+      <div className="flex flex-wrap justify-center gap-4">
+        <button
+          onClick={() => handleShare('facebook')}
+          className="flex items-center gap-2 px-6 py-3 bg-[#1877F2] text-white rounded-lg hover:bg-[#1877F2]/90 transition-all hover:scale-105"
+        >
+          <Facebook className="w-5 h-5" />
+          Facebook
+        </button>
+        <button
+          onClick={() => handleShare('twitter')}
+          className="flex items-center gap-2 px-6 py-3 bg-[#1DA1F2] text-white rounded-lg hover:bg-[#1DA1F2]/90 transition-all hover:scale-105"
+        >
+          <Twitter className="w-5 h-5" />
+          Twitter
+        </button>
+        <button
+          onClick={() => handleShare('linkedin')}
+          className="flex items-center gap-2 px-6 py-3 bg-[#0A66C2] text-white rounded-lg hover:bg-[#0A66C2]/90 transition-all hover:scale-105"
+        >
+          <Linkedin className="w-5 h-5" />
+          LinkedIn
+        </button>
+        <button
+          onClick={() => handleShare('copy')}
+          className="flex items-center gap-2 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all hover:scale-105"
+        >
+          <Link2 className="w-5 h-5" />
+          Copy Text
+        </button>
+        {navigator.share && (
+          <button
+            onClick={() => handleShare('native')}
+            className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all hover:scale-105"
+          >
+            Share
+          </button>
+        )}
+      </div>
+      <div className="mt-4 text-sm text-gray-500 dark:text-gray-400 text-center">
+        Your image will be shared along with a message about Bacha Khan Month 2025
+      </div>
+    </div>
   );
-};
-
-export default SocialShare;
+}

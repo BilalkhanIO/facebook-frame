@@ -1,39 +1,41 @@
-import { Geist, Geist_Mono } from "next/font/google";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import "./globals.css";
+import { Inter } from 'next/font/google';
+import './globals.css';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: "Bacha Khan Month 2025",
-  description: "Create your own profile frame for Bacha Khan Month 2025",
+  title: 'Bacha Khan Month 2025 - Profile Frame Editor',
+  description: 'Create your personalized profile frame for Bacha Khan Month 2025. Upload, edit, and share your framed profile picture.',
+  keywords: ['Bacha Khan', 'Profile Frame', 'Social Media', '2025'],
+  openGraph: {
+    title: 'Bacha Khan Month 2025 - Profile Frame Editor',
+    description: 'Create your personalized profile frame for Bacha Khan Month 2025',
+    type: 'website',
+  },
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
-      <meta name="google-site-verification" content="4B6Rrg1xTaT-Kh_TJkregNa4evS9wNOgT3f41hqeG88" />
-        {/* Google AdSense Script */}
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4779738061304824"
-          crossorigin="anonymous"
-        ></script>
+        <meta name="theme-color" content="#dc2626" />
+        <link rel="icon" href="/favicon.ico" />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={inter.className}>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var mode = localStorage.getItem('theme');
+                  if (!mode) mode = 'light';
+                  document.documentElement.setAttribute('data-theme', mode);
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
         {children}
-        <SpeedInsights />
       </body>
     </html>
   );

@@ -1,8 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["http://localhost:3000/"],
+    domains: [],
+    remotePatterns: [],
   },
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.(png|jpg|gif|svg)$/i,
+      type: 'asset/resource'
+    });
+    return config;
+  }
 };
 
 export default nextConfig;

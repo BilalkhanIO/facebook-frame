@@ -1,57 +1,99 @@
-import React from "react";
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
 
 const frames = [
-  { id: 1, src: "/frames/frame1.png", category: "basic" },
-  { id: 2, src: "/frames/frame2.png", category: "premium" },
-  { id: 3, src: "/frames/frame3.png", category: "basic" },
-  // Additional frames can be added here.
+  {
+    id: "frame1",
+    name: "Classic Frame",
+    category: "Basic",
+    src: "/frames/frame1.png",
+  },
+  {
+    id: "frame2",
+    name: "Premium Frame",
+    category: "Premium",
+    src: "/frames/frame2.png",
+  },
+  {
+    id: "elegant",
+    name: "Elegant Frame",
+    category: "Premium",
+    src: "/frames/elegant.png",
+  },
+  {
+    id: "simple",
+    name: "Simple Frame",
+    category: "Basic",
+    src: "/frames/simple.png",
+  },
 ];
 
 const categories = [
   { id: "all", name: "All Frames" },
-  { id: "basic", name: "Basic" },
-  { id: "premium", name: "Premium" },
+  { id: "Basic", name: "Basic" },
+  { id: "Premium", name: "Premium" },
   { id: "custom", name: "Custom" },
 ];
 
-const FrameSelector = ({ selectedCategory, onCategoryChange, selectedFrame, onFrameSelect }) => {
+export default function FrameSelector({
+  selectedCategory,
+  onCategoryChange,
+  selectedFrame,
+  onFrameSelect,
+}) {
   const filteredFrames =
     selectedCategory === "all"
       ? frames
       : frames.filter((frame) => frame.category === selectedCategory);
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
-      <select
-        value={selectedCategory}
-        onChange={(e) => onCategoryChange(e.target.value)}
-        className="w-full p-2 border border-gray-300 rounded-lg"
-      >
+    <div className="space-y-4">
+      {/* Category Selection */}
+      <div className="flex flex-wrap gap-2">
         {categories.map((category) => (
-          <option key={category.id} value={category.id}>
-            {category.name}
-          </option>
-        ))}
-      </select>
-
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
-        {filteredFrames.map((frame) => (
-          <div
-            key={frame.id}
-            onClick={() => onFrameSelect(frame)}
-            className={`relative aspect-square border-2 rounded-lg cursor-pointer transition-all ${
-              selectedFrame?.id === frame.id
-                ? "border-red-500 shadow-lg"
-                : "border-gray-200 hover:border-red-300"
+          <button
+            key={category.id}
+            onClick={() => onCategoryChange(category.id)}
+            className={`px-4 py-2 rounded-lg transition-colors ${
+              selectedCategory === category.id
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary hover:bg-secondary/80"
             }`}
           >
-            <Image src={frame.src} alt={`Frame ${frame.id}`} fill className="object-contain p-2" />
-          </div>
+            {category.name}
+          </button>
+        ))}
+      </div>
+
+      {/* Frame Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {filteredFrames.map((frame) => (
+          <button
+            key={frame.id}
+            onClick={() => onFrameSelect(frame)}
+            className={`p-4 border rounded-lg transition-all ${
+              selectedFrame?.id === frame.id
+                ? "border-primary bg-primary/5"
+                : "border-border hover:border-primary/50"
+            }`}
+          >
+            <div className="relative w-full aspect-square mb-2">
+              <img
+                width={200}
+                height={200}
+                src={frame.src}
+                alt={frame.name}
+                className="w-full h-full object-contain"
+                loading="lazy"
+                crossOrigin="anonymous"
+              />
+            </div>
+            <p className="text-sm font-medium">{frame.name}</p>
+            <p className="text-xs text-foreground/60">{frame.category}</p>
+          </button>
         ))}
       </div>
     </div>
   );
-};
-
-export default FrameSelector;
+}

@@ -1,191 +1,107 @@
 "use client";
-import React, { useState, useRef, useCallback } from "react";
-import { Download, Share, X } from "lucide-react";
-import html2canvas from "html2canvas";
-import ThemeToggle from "@/components/ThemeToggle";
-import ImageUploader from "@/components/ProfileEditor/ImageUploader";
-import ImageEditor from "@/components/ProfileEditor/ImageEditor";
-import FrameSelector from "@/components/ProfileEditor/FrameSelector";
-import SocialShare from "@/components/SocialShare";
+import Link from 'next/link';
+import Layout from '@/components/Layout';
+import Image from 'next/image';
+import { Camera, Quote } from 'lucide-react';
 
-const ProfileFrameEditor = () => {
-  const [userImage, setUserImage] = useState(null);
-  const [selectedFrame, setSelectedFrame] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [zoom, setZoom] = useState(1);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [shareImageUrl, setShareImageUrl] = useState(null);
-  const editorRef = useRef(null);
-
-  // Called when an image (cropped or not) is uploaded
-  const handleImageUpload = useCallback((imageData) => {
-    setUserImage(imageData);
-    setPosition({ x: 0, y: 0 });
-    setZoom(1);
-  }, []);
-
-  // Capture the editor area and trigger download
-  const handleDownload = async () => {
-    if (!editorRef.current) return;
-
-    // Hide UI controls (elements with class "no-capture") during capture
-    const controls = document.querySelectorAll(".no-capture");
-    controls.forEach((el) => (el.style.display = "none"));
-
-    const canvas = await html2canvas(editorRef.current, {
-      useCORS: true,
-      backgroundColor: null,
-    });
-
-    // Restore controls
-    controls.forEach((el) => (el.style.display = ""));
-
-    const imageUrl = canvas.toDataURL("image/png");
-    // Optionally, update shareImageUrl so social share buttons reflect the same image
-    setShareImageUrl(imageUrl);
-
-    const link = document.createElement("a");
-    link.download = "frame-for-bacha-khan-month-2025.png";
-    link.href = imageUrl;
-    link.click();
-  };
-
-  // Capture the current editor area and update shareImageUrl
-  const handleShare = async () => {
-    if (!editorRef.current) return;
-
-    const controls = document.querySelectorAll(".no-capture");
-    controls.forEach((el) => (el.style.display = "none"));
-
-    const canvas = await html2canvas(editorRef.current, {
-      useCORS: true,
-      backgroundColor: null,
-    });
-
-    controls.forEach((el) => (el.style.display = ""));
-
-    const imageUrl = canvas.toDataURL("image/png");
-    setShareImageUrl(imageUrl);
-  };
-
-  const handleClear = useCallback(() => {
-    setUserImage(null);
-    setSelectedFrame(null);
-    setShareImageUrl(null);
-  }, []);
-
-  // Custom frame upload handler – user can upload their own frame image.
-  const handleCustomFrameUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      alert("Please upload an image file for the frame.");
-      return;
-    }
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      // Create a custom frame object with id "custom"
-      setSelectedFrame({
-        id: "custom",
-        src: reader.result,
-        category: "custom",
-      });
-      // Also set selected category to "custom" if desired:
-      setSelectedCategory("custom");
-    };
-    reader.readAsDataURL(file);
-  };
+export default function HomePage() {
+ 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 p-4 md:p-8">
-      <div className="max-w-4xl mx-auto">
-        {/* Header and Theme Toggle */}
-        <div className="flex justify-between items-center mb-6">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-red-700">
-              Frame for Bacha Khan Month 2025
-            </h1>
-            <p className="text-md text-red-600 mt-2">
-              Upload your photo, adjust & crop, select a frame, then
-              download/share your commemorative image.
-            </p>
-          </div>
-          <ThemeToggle />
+    <Layout>
+      <div className="max-w-4xl mx-auto px-4 py-12">
+        <div className="text-center mb-12">
+          <h2 className="text-2xl md:text-3xl font-bold text-red-800 dark:text-red-200 mb-4">
+            Welcome to Bacha Khan Month 2025 Celebration
+          </h2>
+          <p className="text-lg text-red-600 dark:text-red-300">
+            Choose a tool below to create and share your personalized content
+          </p>
         </div>
 
-        {/* Image upload and adjustment */}
-        {!userImage ? (
-          <ImageUploader onImageUpload={handleImageUpload} />
-        ) : (
-          <>
-            <div className="space-y-8">
-              {/* Editor area – only the visible area (with overflow-hidden) will be captured */}
-              <div>
-                <ImageEditor
-                  editorRef={editorRef}
-                  image={userImage}
-                  frame={selectedFrame}
-                  zoom={zoom}
-                  position={position}
-                  onZoomChange={setZoom}
-                  onPositionChange={setPosition}
-                />
-              </div>
-
-              {/* Frame selection */}
-              <FrameSelector
-                selectedCategory={selectedCategory}
-                onCategoryChange={setSelectedCategory}
-                selectedFrame={selectedFrame}
-                onFrameSelect={setSelectedFrame}
+        {/* Bacha Khan Introduction */}
+        <div className="mb-16 bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+          <div className="grid md:grid-cols-2 gap-6 p-8">
+            <div className="relative aspect-square rounded-lg overflow-hidden bg-red-50 dark:bg-red-900/20">
+              <Image
+                src="/images.jpg"
+                alt="Bacha Khan Portrait"
+                width={400}
+                height={400}
+                className="object-contain"
+                priority
               />
-
-              {/* Custom frame upload option */}
-              <div className="no-capture my-4 text-center">
-                <label className="cursor-pointer px-6 py-4 bg-green-600 text-white rounded-lg hover:bg-green-600 transition-colors">
-                  Upload Your Frame
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleCustomFrameUpload}
-                    className="hidden"
-                  />
-                </label>
-              </div>
-
-              {/* Action controls */}
-              <div className="no-capture flex flex-wrap justify-center items-center gap-4">
-                <button
-                  onClick={handleDownload}
-                  className="flex items-center gap-2 px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-                >
-                  <Download className="w-5 h-5" />
-                  Download
-                </button>
-                <button
-                  onClick={handleShare}
-                  className="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                >
-                  <Share className="w-5 h-5" />
-                  Share
-                </button>
-                <button
-                  onClick={handleClear}
-                  className="flex items-center gap-2 px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                  Clear
-                </button>
-              </div>
             </div>
+            <div className="flex flex-col justify-center">
+              <h3 className="text-xl md:text-2xl font-bold text-red-800 dark:text-red-200 mb-4">
+                Khan Abdul Ghaffar Khan
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
+                Known as "Bacha Khan" and "Frontier Gandhi," Khan Abdul Ghaffar Khan (1890-1988) was a pioneering nonviolent activist, spiritual leader, and reformer from the North-West Frontier Province of British India (now Khyber Pakhtunkhwa, Pakistan).
+              </p>
+              <p className="text-gray-600 dark:text-gray-300">
+                He founded the Khudai Khidmatgar ("Servants of God") movement, promoting nonviolence, education, and social reform. His lifelong commitment to peace, interfaith harmony, and social justice continues to inspire millions worldwide.
+              </p>
+            </div>
+          </div>
+        </div>
 
-            {/* Social Share Buttons (immediately update as soon as image is captured) */}
-            {shareImageUrl && <SocialShare shareImageUrl={shareImageUrl} />}
-          </>
-        )}
+        {/* Feature Cards */}
+        <div className="grid md:grid-cols-2 gap-8 mb-16">
+          {/* Frame Generator Card */}
+          <Link 
+            href="/frame-generator"
+            className="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 transition-all hover:scale-105 hover:shadow-xl"
+          >
+            <div className="absolute top-0 left-0 w-full h-2 bg-red-600 rounded-t-2xl" />
+            <div className="bg-red-50 dark:bg-red-900/20 rounded-full w-16 h-16 flex items-center justify-center mb-6">
+              <Camera className="w-8 h-8 text-red-600 dark:text-red-400" />
+            </div>
+            <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">
+              Frame Generator
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300">
+              Create a personalized profile frame by uploading your photo and choosing from our collection of frames.
+            </p>
+            <div className="mt-6 text-red-600 dark:text-red-400 group-hover:translate-x-2 transition-transform">
+              Get Started →
+            </div>
+          </Link>
+
+          {/* Quote Generator Card */}
+          <Link 
+            href="/quote-generator"
+            className="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 transition-all hover:scale-105 hover:shadow-xl"
+          >
+            <div className="absolute top-0 left-0 w-full h-2 bg-red-600 rounded-t-2xl" />
+            <div className="bg-red-50 dark:bg-red-900/20 rounded-full w-16 h-16 flex items-center justify-center mb-6">
+              <Quote className="w-8 h-8 text-red-600 dark:text-red-400" />
+            </div>
+            <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">
+              Quote Generator
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300">
+              Generate inspirational quotes with beautiful backgrounds, perfect for sharing on social media.
+            </p>
+            <div className="mt-6 text-red-600 dark:text-red-400 group-hover:translate-x-2 transition-transform">
+              Get Started →
+            </div>
+          </Link>
+        </div>
+
+        {/* Additional Info */}
+        <div className="text-center">
+          <div className="inline-block bg-red-50 dark:bg-red-900/20 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
+              About Bacha Khan Month
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              Join us in celebrating the legacy of Bacha Khan by creating and sharing personalized content. 
+              Use our tools to spread his message of peace, non-violence, and social reform.
+            </p>
+          </div>
+        </div>
       </div>
-    </div>
+    </Layout>
   );
-};
-
-export default ProfileFrameEditor;
+}
